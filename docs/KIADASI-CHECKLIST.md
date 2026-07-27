@@ -44,7 +44,13 @@ Nincs jóváhagyás, nincs díj. Itt lehet a legolcsóbban tesztelni, hogy a já
 
 - [ ] Repülő módban is elindul és játszható
 - [ ] App bezárás/újranyitás után a mentés megmarad
-- [ ] Óra átállítása előre nem ad végtelen pénzt
+- [ ] Óra átállítása előre nem ad végtelen pénzt — **ismert, dokumentált korlát**:
+      egyetlen visszatérés jutalma helyesen plafonozott (`offlineCapMs`, tesztelve
+      `math.test.ts`-ben), DE mivel a `lastSeen` fal-óra időbélyeg (nem monoton),
+      az "óra előre + újratöltés" ismételve korlátlan pénzt ad, szerver nélkül ez
+      klienoldalon nem zárható ki tökéletesen (lásd GDD.md kockázat-táblázat).
+      Valódi javítás csak szerveridő-ellenőrzéssel lenne, ami backendet igényelne
+      — ez a v1.0 utáni kör, amíg nincs backend, ez tudatosan vállalt kockázat
 - [ ] Minden reklámhely megjelenik és jutalmaz (teszt-azonosítókkal)
 - [ ] Minden IAP megvehető sandboxban, és a vásárlás visszaáll újratelepítés után
 - [x] Kis képernyőn (360×640, 375px) sem lóg ki semmi — ellenőrizve minden fülön/al-fülön

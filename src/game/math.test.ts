@@ -215,6 +215,27 @@ describe('offlineEarnings', () => {
     const report = offlineEarnings(s, 3_600_000)!;
     expect(report.ranDry).toBe(false);
   });
+
+  it('documents a known limitation: a single claim is capped, but nothing here prevents repeatedly advancing the system clock and reloading for unlimited claims', () => {
+    // This function only ever sees `awayMs`, computed upstream (store.ts
+    // loadState) as `Date.now() - lastSeen`, a WALL-CLOCK delta — not a
+    // monotonic one. A single offline report is correctly capped at
+    // offlineCapMs (verified above), so one clock-forward jump can't grant
+    // more than the cap. But because `lastSeen` gets rewritten to the
+    // (attacker-controlled) current Date.now() on every save/claim, a
+    // player can repeat "advance clock -> reload -> claim" indefinitely
+    // for unbounded money, entirely offline, no server round-trip needed
+    // to detect it. GDD.md's risk table already flags this as deferred
+    // to v1.0 with server-time verification — there is no server today,
+    // by design (no accounts, no backend cost). This test exists so the
+    // limitation is explicit and testable, not silently assumed "handled"
+    // because a per-claim cap exists.
+    const s = makeState({ stations: { ...makeState().stations, maki: { level: 10, manager: true, progress: 0, running: true } } });
+    const cap = offlineCapMs(s);
+    const claim1 = offlineEarnings(s, cap)!.earned;
+    const claim2 = offlineEarnings(s, cap)!.earned; // simulates a second "clock forward + reload"
+    expect(claim1 + claim2).toBeCloseTo(claim1 * 2, 2); // nothing here rate-limits repetition
+  });
 });
 
 describe('abilityCooldown', () => {

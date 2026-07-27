@@ -131,6 +131,17 @@ csöppen bele egyszerre.
 
 ## Nap 6 — Natív build, eszközteszt, teljesítmény
 
+**Részlegesen elkezdve, fiók/SDK nélkül amennyire lehetett:**
+- [x] `npx cap add android` lefutott — az `android/` mappa helyben létezik
+      (szándékosan NEM kerül git-be, lásd `.gitignore` — a `cap add` bármikor
+      újra legenerálja, nincs kézzel szerkesztett tartalma)
+- [ ] Tényleges build/futtatás blokkolva: ezen a gépen nincs Android SDK/Studio
+      telepítve (`ANDROID_HOME` üres, nincs `adb`/`gradle`). A `./gradlew tasks`
+      60 másodperc után timeoutolt SDK hiányában. Ehhez a te gépeden kell
+      Android Studio, vagy mondd, ha telepítsem ezen a gépen (nagy letöltés)
+- Ikon-/splash-generálás és a többi alábbi lépés natív build nélkül nem végezhető el
+
+Amit még megcsinálok, mielőtt ez a nap valóban lezárul:
 - `npx cap add android`, ikon- és splash-generálás minden méretben
 - **Aláíró kulcs (keystore) létrehozása** — ha ez elvész, az alkalmazás soha többé nem
   frissíthető. Biztonságos mentést is beállítok, és megmutatom, hova tetted
