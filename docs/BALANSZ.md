@@ -102,6 +102,13 @@ mint a jó — ez már érezhető büntetés a figyelmetlenségért, de nem ját
 > minden hírnév-szinten ugyanaz az árszint nyer, és a döntés kikerül a játékból —
 > ez volt az első verzió hibája (csak egyetlen váltás volt az egész 0-100 skálán).
 
+> **A `management.test.ts` egy érdekes tényt zár le tesztben:** a teljes 0-100
+> hírnév-tartományban a **Menza** (id 0) és a **Luxus** (id 4) szint **soha nem
+> optimális** — mindig veszít a szomszédjával szemben. Ez nem hiba (a fenti
+> táblázat is ezt mutatja: sosem ajánlott egyik sem), de ha a szintek számát
+> vagy árát módosítod, érdemes tudni, hogy jelenleg csak 3 szint (Barátságos,
+> Városi átlag, Prémium) valódi verseng egymással a gyakorlatban.
+
 ### Alapanyag — miért arányos az ár
 
 Egy adag alapanyag a **bevételének 20%-a**, nem fix összeg. Fix árnál a késői
