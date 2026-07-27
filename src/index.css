@@ -311,6 +311,7 @@ button:disabled { cursor: default; }
 .tag-auto { background: #1e4630; color: var(--green); }
 .tag-hire { background: var(--card-2); border: 1px solid var(--line); color: var(--gold); }
 .tag-hire:disabled { color: var(--muted); opacity: 0.6; }
+.tag-combo { background: #4a1a0e; color: var(--gold-2); }
 
 .progress {
   position: relative; height: 22px; border-radius: 7px;
@@ -547,6 +548,7 @@ button:disabled { cursor: default; }
   background: #3a2a0e; color: var(--gold); padding: 2px 7px; border-radius: 999px;
 }
 .chef-effect { font-size: 12px; color: var(--green); font-weight: 700; margin: 2px 0 5px; }
+.chef-combo { font-size: 11px; color: var(--gold-2); font-weight: 700; margin-bottom: 5px; }
 .chef-flavor { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 5px; }
 .chef-max { font-size: 11px; font-weight: 800; color: var(--gold); }
 

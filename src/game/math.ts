@@ -6,7 +6,7 @@ import { UPGRADE_BY_ID } from './upgrades';
 import { ACHIEVEMENT_BONUS } from './achievements';
 import { perkLevel } from './perks';
 import { demandFor, priceOf, reputationMult, servingsLeft } from './management';
-import { chefBonus, synergyBonus } from './chefs';
+import { chefBonus, comboBonus, synergyBonus } from './chefs';
 import { leagueMult } from './league';
 import { michelinMult } from './michelin';
 
@@ -117,8 +117,11 @@ export function cycleIncome(state: GameState, def: StationDef, now = Date.now())
   if (!st || st.level === 0) return 0;
   // Az állomás-specifikus séfbónusz itt jön be; a globális a globalMult-ban van.
   const chef = 1 + chefBonus(state, 'income', 'station', def.id) / 100;
+  // Recept-kombó: a séf saját fogásán, a szintezhető hatástól függetlenül.
+  const combo = 1 + comboBonus(state, def.id) / 100;
   return (
-    def.baseIncome * st.level * milestoneMult(st.level) * upgradeMult(state, def.id) * chef * globalMult(state, now)
+    def.baseIncome * st.level * milestoneMult(st.level) * upgradeMult(state, def.id)
+    * chef * combo * globalMult(state, now)
   );
 }
 

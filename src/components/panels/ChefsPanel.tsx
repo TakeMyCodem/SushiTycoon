@@ -1,8 +1,9 @@
 import { useGame } from '../../game/store';
 import {
-  CHEFS, FRAGMENT_GEM_COST, MAX_SLOTS, RARITY, SCHOOLS, SYNERGY_PCT, chefOfTheDay, chefState,
-  describeEffect, fragmentsForNext, slotCost, synergyBonus,
+  CHEFS, COMBO_BONUS_PCT, FRAGMENT_GEM_COST, MAX_SLOTS, RARITY, SCHOOLS, SYNERGY_PCT, chefOfTheDay,
+  chefState, describeEffect, fragmentsForNext, slotCost, synergyBonus,
 } from '../../game/chefs';
+import { STATION_BY_ID } from '../../game/config';
 import { dayNumber } from '../../game/management';
 
 /**
@@ -81,6 +82,11 @@ export function ChefsPanel() {
           from the daily gift and from finishing a shift with stars. Every other chef: buy fragments
           with 💎 gems below (fixed price, marked "+5" on their card).
         </p>
+        <p className="muted small">
+          🔥 <b>Combo:</b> a chef in the kitchen on their signature dish (shown on their card) gives
+          an extra <b>+{COMBO_BONUS_PCT}%</b> income on that dish, on top of their normal effect —
+          worth swapping your roster around when you're pushing a specific dish.
+        </p>
       </div>
 
       {order.map((def) => {
@@ -106,6 +112,9 @@ export function ChefsPanel() {
                 </span>
               </div>
               <div className="chef-effect">{describeEffect(def, st.level)}</div>
+              <div className="chef-combo">
+                🔥 Combo: {STATION_BY_ID[def.comboDish]?.emoji} {STATION_BY_ID[def.comboDish]?.name} +{COMBO_BONUS_PCT}%
+              </div>
               {!owned && <div className="chef-flavor">{def.flavor}</div>}
               {need != null && (
                 <div className="frag-bar">

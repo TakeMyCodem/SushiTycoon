@@ -30,6 +30,24 @@ const MILESTONES = [25, 50, 100, 200, 300, 400, 500, 600, 700, 800];
 const SPEED_MILESTONES = [100, 200, 300];
 /** A `store.ts` ingyen managere: a 10. szinten megjön Yuki. */
 const FREE_MANAGER_LEVEL = 10;
+/** A menedzsment-réteg (management.ts) ennyi nyitott fogástól kapcsol be. */
+const MANAGEMENT_UNLOCK_STATIONS = 3;
+
+/**
+ * A menedzsment-réteg (árazás + hírnév) hatása — a `management.ts` másolata.
+ * A passzív szimulátor NEM kezel hírnév-dinamikát (nincs VIP-elkapás, nincs
+ * műszak, nincs alapanyag-kifogyás sem modellezve), ezért a REPUTATION_START
+ * alapértéken (50) számolt, elérhető LEGJOBB árszint nettó szorzóját vesszük
+ * állandónak — ez így is, úgy is pesszimista alsó becslés marad, hiszen a
+ * valós játékos a hírnevet 50 fölé tolja jó műszakokkal és VIP-ekkel.
+ */
+const PRICE_TIERS = [0.7, 1.0, 1.3, 1.7, 2.2];
+const PRICE_ELASTICITY = 0.7;
+const REPUTATION_START = 50;
+const priceTolerance = (rep) => 0.6 + (Math.max(0, Math.min(100, rep)) / 100) * 1.6;
+const demandFor = (price, rep) => Math.max(0.15, Math.min(1.5, 1 + (priceTolerance(rep) - price) * PRICE_ELASTICITY));
+const netRate = (price, rep) => price * demandFor(price, rep);
+const MGMT_MULT = Math.max(...PRICE_TIERS.map((p) => netRate(p, REPUTATION_START)));
 
 const mile = (l) => MILESTONES.reduce((x, k) => (l >= k ? x * 2 : x), 1);
 const spd = (l) => SPEED_MILESTONES.reduce((d, k) => (l >= k ? d * 2 : d), 1);
@@ -50,11 +68,20 @@ function simulate(hours) {
   const log = [];
   const inc = (i) => STATIONS[i][3] * lvl[i] * mile(lvl[i]);
   const rate = (i) => (mgr[i] ? inc(i) / (STATIONS[i][4] / spd(lvl[i])) : 0);
+  let mgmtLoggedAt = null;
 
   for (let t = 1; t <= hours * 3600; t++) {
-    let r = STATIONS.reduce((a, _, i) => a + rate(i), 0);
+    const openCount = lvl.reduce((a, l) => a + (l > 0 ? 1 : 0), 0);
+    const mgmtOn = openCount >= MANAGEMENT_UNLOCK_STATIONS;
+    if (mgmtOn && mgmtLoggedAt === null) {
+      mgmtLoggedAt = t;
+      log.push([t, `management unlocked — pricing x${MGMT_MULT.toFixed(2)} kicks in`]);
+    }
+    const mult = mgmtOn ? MGMT_MULT : 1;
+
+    let r = STATIONS.reduce((a, _, i) => a + rate(i), 0) * mult;
     // Amíg nincs első manager, a játékos kattint.
-    if (!mgr[0]) r += inc(0) / STATIONS[0][4];
+    if (!mgr[0]) r += (inc(0) / STATIONS[0][4]) * mult;
     money += r;
     lifetime += r;
 

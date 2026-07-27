@@ -10,19 +10,37 @@ Egy „ésszerű játékost" modellez: a legjobb megtérülésű állomásra kö
 ha 3 ciklus alatt megtérül, új fogást nyit, ha marad tartaléka. **Nem** használ
 képességet, eseményt, reklámot vagy gyémántot — ez tehát a **pesszimista alsó becslés**.
 
-## Aktuális eredmény (24 óra)
+## Aktuális eredmény (1 / 24 / 168 óra)
+
+A szimulátor a Nap 3-as frissítés óta a **menedzsment-réteg árazását is beszámítja**:
+amint a 3. fogás megnyílik, a legjobb elérhető árszint nettó szorzójával (`REPUTATION_START`
+= 50 hírnévnél ez a Városi átlag, ×1,39) szorzódik a bevétel. Az alapanyagköltséget
+szándékosan **nem** vonja le (a beszerzési döntés aktív játékot igényelne) — ez nagyjából
+kiegyenlíti a hírnév-dinamika hiányát (a valós játékos VIP-ekkel és jó műszakokkal 50 fölé
+tolja a hírnevet, ami tovább nőtt bevételt adna). Képességet, eseményt, reklámot, séfet
+és gyémántot továbbra sem használ — ez tehát **pesszimista alsó becslés**.
 
 | Idő | Esemény |
 |---|---|
 | ~20 mp | Első manager (ingyen, a 10. szinten) — innentől él az idle-gazdaság |
-| 1-2 perc | 2. és 3. fogás megnyílik |
-| 16-50 perc | 2-5. manager |
+| 1-2 perc | 2. és 3. fogás megnyílik → menedzsment-réteg bekapcsol (×1,39 árazás) |
+| 16-55 perc | 2-6. manager |
 | ~1 óra | Első prestige elérhető (10 csillag ≈ 2,5e8 összbevétel) |
-| 51-80 perc | 6-7. fogás |
-| 2,4-6 óra | Ramen és Dragon Roll manager |
-| 8,6-23,5 óra | Utolsó két fogás |
+| 12-17 óra | Utolsó két fogás (kaiseki) és managere |
 
-24 óra alatt: **1,59e12 összbevétel, 798 csillag**, mind a 10 fogás megnyitva.
+| Időtartam | Összes keresett | Elérhető csillag |
+|---|---|---|
+| 1 óra | 6,10e8 | 15 |
+| 24 óra | 3,41e12 | 1 167 |
+| 168 óra (1 hét) | 4,94e15 | 44 433 |
+
+168 órára (`node tools/balance-sim.mjs 168`) az összes fogás szinten 121-355 között áll —
+vagyis egy hét pesszimista, tétlen (nincs koppintás, nincs séf) játék is **több tízezer
+karrier-csillagot** hoz, ami a [Michelin-fokozatoknál](#végjáték--michelin-fokozatok-nap-3)
+leírt 1000 csillagos 3. fokozat küszöbét simán átlépi — ha eléri a 15 prestige-et is.
+Ez utóbbi a valódi szűk keresztmetszet: a szimulátor egyáltalán nem prestige-el (a modell
+"mindig tovább fejleszt" stratégiát követ), tehát a végjáték-fokozatok eléréséhez a
+prestige-gyakoriság a döntő tényező, nem a nyers bevétel.
 
 ## Amit a szimuláció talált (és javítottunk)
 
@@ -101,6 +119,24 @@ hogy aki nem ér rá, lemaradjon a játékról.
 A készletet **időben áruljuk** (1 / 6 / 24 óra), nem darabszámban: a játékosnak
 nem kell fejben osztania a ciklusidővel, és a csomag automatikusan skálázódik
 a fejlettségével.
+
+## Recept-kombók (Nap 3)
+
+Minden séfnek van egy fix "signature dish"-e (`comboDish` a `chefs.ts`-ben) — ha a séf a
+konyhában van ÉS az a fogás nyitva van, +15% bevétel jár rá, a séf szintezhető alaphatásán
+**felül**, nem szintezhető. Ez nem gacha-mechanika: a párosítás fix és látható a séf
+kártyáján, a döntés a kinevezés, nem a szerencse.
+
+Miért éri ez meg egy órát: enélkül a végjátékban a roster egyszer összeáll (legerősebb 5
+séf betéve) és onnantól soha nem változik. A kombó ad okot arra, hogy amikor épp a
+Wagyu-t fejleszted, Hanát tedd be (bár az ő alaphatása alapanyag-árra megy, nem Wagyu-ra),
+ne a nyers legjobb bevétel-százalékú séfet — így a gyűjtemény a késői játékban is aktív
+döntés marad, nem statikus optimalizálási feladat egyszeri megoldással.
+
+A párosítások a séfek flavor-szövegéhez igazodnak (pl. Ryu → Dragon Roll, mert a flavor
+szerint az ő receptje), és két fogásnak (sashimi, kaiseki) szándékosan két-két combo-séfe
+is van — ez ad választást azon belül is, hogy melyik séf kerüljön be, ha épp azt a fogást
+tolod.
 
 ## Végjáték — Michelin-fokozatok (Nap 3)
 

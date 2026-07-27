@@ -5,6 +5,7 @@ import {
 } from '../game/math';
 import { STATIONS } from '../game/config';
 import { ABILITY_BY_STATION } from '../game/abilities';
+import { COMBO_BONUS_PCT, hasCombo } from '../game/chefs';
 
 export function StationCard({ def, index }: { def: StationDef; index: number }) {
   const s = useGame((g) => g.s);
@@ -25,6 +26,7 @@ export function StationCard({ def, index }: { def: StationDef; index: number }) 
   const pop = pops.filter((p) => p.stationId === def.id).slice(-1)[0];
   const mgrCost = managerCost(s, def);
   const ability = ABILITY_BY_STATION[def.id];
+  const combo = !locked && hasCombo(s, def.id);
 
   // Zárolt állomás: csak az előző megnyitása után mutatjuk, hogy legyen mit várni.
   const prevId = index > 0 ? STATIONS[index - 1].id : null;
@@ -56,6 +58,11 @@ export function StationCard({ def, index }: { def: StationDef; index: number }) 
       <div className="station-body">
         <div className="station-head">
           <span className="station-name">{def.name}</span>
+          {combo && (
+            <span className="tag tag-combo" title={`A chef in your kitchen has this as their signature dish: +${COMBO_BONUS_PCT}% income`}>
+              🔥 Combo
+            </span>
+          )}
           {st.manager ? (
             <span className="tag tag-auto">AUTO</span>
           ) : (
