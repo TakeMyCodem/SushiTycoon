@@ -1,10 +1,15 @@
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Szándékosan nincs StrictMode: dev módban kétszer futtatná az effekteket,
 // amitől két párhuzamos játékhurok indulna és dupla bevétel jönne.
-createRoot(document.getElementById('root')!).render(<App />);
+createRoot(document.getElementById('root')!).render(
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>,
+);
 
 // PWA: csak prod buildben regisztráljuk, dev alatt csak zavarna a HMR-be.
 // Relatív útvonal ("./sw.js"), NEM "/sw.js": a GitHub Pages tesztverzió egy
