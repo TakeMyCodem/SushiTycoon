@@ -5,10 +5,11 @@
 
 ---
 
-## Hol tartunk most (1. nap vége)
+## Hol tartunk most (Nap 1-5 kész, Nap 6 részleges — 2026-07-27)
 
-Az első napon elkészült a teljes játékváz. Ez nem prototípus: futtatható, végigtesztelt,
-produkciós buildben is ellenőrzött játék.
+*Ez a szakasz a legutóbbi átfogó frissítésig tartja magát pontosnak; a fenti napi
+bontás az eredeti terv, egyes tartalmak (Liga, Michelin-fokozat, séf-kombó,
+tesztkeret) a napi bontáshoz képest bővültek menet közben.*
 
 | Réteg | Mi van kész |
 |---|---|
@@ -17,12 +18,18 @@ produkciós buildben is ellenőrzött játék.
 | **Aktív** | 6 manager-képesség cooldownnal, csúcsforgalom-esemény, elkapható VIP vendégek |
 | **Ügyesség** | 60 másodperces műszak-minijáték: kombó, VIP és nagy rendelés, csillagos értékelés, reklámos duplázás |
 | **Menedzsment** | Étlap-árazás mozgó optimummal, hírnév 0-100, alapanyagpiac napi árakkal, beszállítói szerződés |
-| **Gyűjtés** | 13 séf ritkasággal, töredékekből, loot box nélkül; konyhai helyek, iskola-szinergia |
-| **Cél** | 32 küldetésből álló lánc, 30 trófea (mind +3% örök bevétel), napi jutalom |
-| **Technika** | PWA (offline indul), Capacitor konfig, szintetizált hang + rezgés, balansz-szimulátor, analitika- és monetizáció-adapter |
+| **Gyűjtés** | 13 séf ritkasággal, töredékekből, loot box nélkül; konyhai helyek, iskola-szinergia, **recept-kombók** (+15% a séf saját fogásán) |
+| **Verseny** | **Heti liga**: 20 fős tábla, 5 divízió, determinisztikus (szerver nélküli) botok, fel-/kiesés |
+| **Végjáték** | **Michelin-fokozatok**: karrier-csillag + prestige-szám együtt nyitja, +15/35/60% örök bónusz |
+| **Cél** | 30 küldetésből álló lánc, 33 trófea (mind +3% örök bevétel), napi jutalom |
+| **Beállítások** | Hang/rezgés külön kapcsoló, nagyobb betűméret, mentés export/import, `prefers-reduced-motion` |
+| **Technika** | PWA (offline indul, SW-útvonalak javítva alkönyvtáras deployhoz), Capacitor konfig, szintetizált hang + rezgés, balansz-szimulátor (1/24/168 óra), lustán töltött natív reklám/IAP/analitika adapter (teszt-azonosítókkal), **217 automatizált teszt** (`npm run test`), GitHub Actions CI (teszt + build minden push-nál) |
+| **Élesítve** | Web build ingyenes GitHub Pages teszt-linken: https://takemycodem.github.io/SushiTycoon/, adatvédelmi tájékoztatóval |
 
-**Ami viszont még nincs meg:** valódi reklám és fizetés (csak adapter van mögötte),
-natív build, store-oldal, és egy rendes bevezető ehhez a sok rendszerhez.
+**Ami még nincs meg:** valódi reklám- és fizetés-SDK bekötve (az adapter kész,
+csak a natív build hiányzik mögüle), natív Android/iOS build (a `android/`
+mappa helyben scaffoldolva, de ezen a gépen nincs Android SDK/Studio a tényleges
+buildhez), store-oldal, ikon-/splash-generálás, valódi eszközteszt.
 
 ---
 
