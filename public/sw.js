@@ -6,7 +6,10 @@
  * Stratégia: navigációra network-first (friss build), assetre cache-first.
  */
 const CACHE = 'sushi-empire-v1';
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.svg', '/icon-512.svg'];
+// Relatív útvonalak (nem gyökér-abszolút): a service worker saját URL-jéhez
+// képest oldódnak fel, tehát a GitHub Pages alkönyvtáras tesztverzión
+// (/SushiTycoon/) is helyesen a saját mappájára mutatnak, nem a domain gyökerére.
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.svg', './icon-512.svg'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -28,10 +31,10 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(
       fetch(req)
         .then((res) => {
-          caches.open(CACHE).then((c) => c.put('/index.html', res.clone()));
+          caches.open(CACHE).then((c) => c.put('./index.html', res.clone()));
           return res;
         })
-        .catch(() => caches.match('/index.html')),
+        .catch(() => caches.match('./index.html')),
     );
     return;
   }
