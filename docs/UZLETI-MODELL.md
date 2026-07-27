@@ -15,9 +15,9 @@ A négy beépített hely (`src/game/monetization.ts` → `RewardedPlacement`):
 | Hely | Mikor | Miért működik | Várható napi nézés/DAU |
 |---|---|---|---|
 | `offline_double` | Visszatéréskor: "duplázd az offline bevételt" | A játékos épp most kapott ingyen pénzt — a duplázás fájdalommentes | 1-2 |
-| `income_boost` | x3 bevétel 4 percre | Aktív játék közben, önként hívott | 3-6 |
-| `free_gems` | Napi néhány ingyen gyémánt | Napi visszatérésre szoktat | 1 |
-| `skip_cooldown` | Várakozás átugrása | Türelmetlenségre árazva | 0-2 |
+| `income_boost` | x3 bevétel 4 percre (Bolt fül) | Aktív játék közben, önként hívott | 3-6 |
+| `shift_double` | Duplázd a műszak-jutalmat | A műszak végén, épp lezárt teljesítmény után — a legjobb pillanat kérni | 2-4 |
+| `skip_cooldown` | Várakozás átugrása a következő műszakig | Türelmetlenségre árazva | 0-2 |
 
 **Számolás:** 6-10 nézés/DAU/nap reális egy jól hangolt idle-nél.
 Rewarded eCPM (2026, tier-1 országok): **$10-18**, globálisan vegyesen **$6-9**.
@@ -86,8 +86,10 @@ Az `analytics.ts` már minden szükséges eseményt lő — csak SDK-t kell mög
 
 ## 4. Jogi és compliance (ezt ne hagyd ki)
 
-- **Adatvédelmi tájékoztató** kötelező, mindkét store megköveteli. Statikus oldal is elég.
-- **GDPR/CMP:** EU-s felhasználóknál hozzájárulás-kezelő kell (a Google UMP SDK ingyenes).
+- **Adatvédelmi tájékoztató** kötelező, mindkét store megköveteli. Statikus oldal is elég —
+  ez már **kész**: [privacy.html](https://takemycodem.github.io/SushiTycoon/privacy.html).
+- **GDPR/CMP:** EU-s felhasználóknál hozzájárulás-kezelő kell (a Google UMP SDK ingyenes) —
+  natívon az AdMob-csomag beépített formája intézi, weben egy saját `ConsentBanner` van kész.
 - **Gyerekek:** ne célozd 13 év alattiakat, különben COPPA/Family Policy szabályok élnek.
   Az App Store korhatár: 4+, de akkor a reklámoknak nem-perszonalizáltnak kell lenniük.
 - **Szerencsejáték-jelleg:** nincs loot box a játékban, szándékosan. Ez elkerül egy egész
