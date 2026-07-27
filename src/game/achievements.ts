@@ -1,5 +1,6 @@
 import type { GameState } from './types';
 import { STATIONS } from './config';
+import { michelinRankFor } from './michelin';
 
 /**
  * Achievementek. Nem jelvénygyűjtés: mindegyik **+3% globális bevételt** ad
@@ -48,6 +49,9 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'a_shift80', name: 'Shift Champion', desc: '80 points in a shift', emoji: '🏅', done: (s) => s.bestShift >= 80 },
   { id: 'a_perk', name: 'Investor', desc: 'Buy a star perk', emoji: '💎', done: (s) => Object.values(s.perks).some((v) => v > 0) },
   { id: 'a_daily7', name: 'Dedicated', desc: '7-day streak', emoji: '📅', done: (s) => s.dailyStreak >= 7 },
+  { id: 'a_league_gold', name: 'League Contender', desc: 'Reach the Gold division', emoji: '🥇', done: (s) => s.league.division >= 2 },
+  { id: 'a_league_diamond', name: 'League Champion', desc: 'Reach the Diamond division', emoji: '👑', done: (s) => s.league.division >= 4 },
+  { id: 'a_michelin1', name: 'Rising Star', desc: 'Earn your first Michelin star', emoji: '⭐', done: (s) => michelinRankFor(s.stars + s.starsSpent, s.stats.prestiges).id >= 1 },
 ];
 
 export const ACHIEVEMENT_BY_ID = Object.fromEntries(
