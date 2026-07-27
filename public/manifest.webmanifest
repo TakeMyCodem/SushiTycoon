@@ -1,0 +1,16 @@
+{
+  "name": "Sushi Empire — Idle Tycoon",
+  "short_name": "Sushi Empire",
+  "description": "Építsd fel a világ legjobb sushi-birodalmát. Az étterem akkor is termel, amikor alszol.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0b1a",
+  "theme_color": "#16122b",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

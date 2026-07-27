@@ -1,0 +1,206 @@
+# Heti terv — Sushi Empire
+
+**Készült:** a projekt 1. napjának végén.
+**Ez a dokumentum az irányadó terv.** Ha bármelyik másik doksi mást mond, ez a nyerő.
+
+---
+
+## Hol tartunk most (1. nap vége)
+
+Az első napon elkészült a teljes játékváz. Ez nem prototípus: futtatható, végigtesztelt,
+produkciós buildben is ellenőrzött játék.
+
+| Réteg | Mi van kész |
+|---|---|
+| **Idle alap** | 10 fogás exponenciális görbével, managerek, mérföldkövek, offline bevétel, prestige (Michelin csillag) |
+| **Döntés** | Fejlesztésfa (6 globális + 40 állomás-specifikus), 7 csillag-perk, ahol az elköltött csillag már nem ad szorzót |
+| **Aktív** | 6 manager-képesség cooldownnal, csúcsforgalom-esemény, elkapható VIP vendégek |
+| **Ügyesség** | 60 másodperces műszak-minijáték: kombó, VIP és nagy rendelés, csillagos értékelés, reklámos duplázás |
+| **Menedzsment** | Étlap-árazás mozgó optimummal, hírnév 0-100, alapanyagpiac napi árakkal, beszállítói szerződés |
+| **Gyűjtés** | 13 séf ritkasággal, töredékekből, loot box nélkül; konyhai helyek, iskola-szinergia |
+| **Cél** | 32 küldetésből álló lánc, 30 trófea (mind +3% örök bevétel), napi jutalom |
+| **Technika** | PWA (offline indul), Capacitor konfig, szintetizált hang + rezgés, balansz-szimulátor, analitika- és monetizáció-adapter |
+
+**Ami viszont még nincs meg:** valódi reklám és fizetés (csak adapter van mögötte),
+natív build, store-oldal, és egy rendes bevezető ehhez a sok rendszerhez.
+
+---
+
+## A hét célja egy mondatban
+
+> A hét végére legyen egy **kiadható**, mért és belőtt játék a Google Play nyílt tesztjében
+> és a weben — valódi reklám- és fizetés-bekötéssel.
+
+---
+
+## Nap 2 — Verseny és közösség (liga)
+
+Ez a négy jóváhagyott mélyítési irány közül az utolsó.
+
+**Mit építek**
+- **Heti liga**: a játékos hetente pontot gyűjt (műszak-eredmények + haladás), és
+  egy 20 fős ligában versenyez
+- **Szimulált ellenfelek**: az ellenfelek a hét sorszámából és a játékos szintjéből
+  determinisztikusan generálódnak — **nulla backend, nulla szerverköltség, nulla GDPR-teher**
+- **Divíziók**: Bronz → Ezüst → Arany → Platina → Gyémánt, feljutással és kieséssel
+- **Heti jutalom**: gyémánt, séf-töredék, és a divízióhoz kötött állandó bónusz
+- **Rekordok**: legjobb műszak, leghosszabb sorozat, összes kiszolgált vendég
+
+**Miért ér ez meg egy napot**
+A liga adja az egyetlen olyan visszatérési okot, ami nem a saját haladásból jön:
+"hétfőn zárul a forduló, most kell egy jó műszak". A szimulált ellenfél nem trükk —
+sok kiadott idle játék így csinálja, és a játékos élménye szempontjából ugyanaz.
+
+**Amire figyelek**
+- Az ellenfelek nehézsége a játékos saját haladásához igazodjon, különben vagy
+  unalmas, vagy demoralizáló
+- A liga **ne legyen pay-to-win**: a pontozás a műszak-teljesítményre épüljön, ne a
+  megvásárolható bevételre
+
+---
+
+## Nap 3 — Egyensúly, hosszú táv, végjáték
+
+Hat rendszer van a játékban. Eddig külön-külön hangoltam őket; ezen a napon **együtt**.
+
+**Mit csinálok**
+- A balansz-szimulátort kiterjesztem az összes új rendszerre (műszak, séfek, árazás,
+  alapanyagköltség), és lefuttatom 1 / 24 / 168 órára
+- Megkeresem, hol áll meg a haladás érzete, és ott javítok
+- **Végjáték**: mi történik, ha valaki mind a 10 fogást megnyitotta és 5-ször prestige-elt?
+  Terv: Michelin-fokozatok (2. és 3. csillag) új, nehezebb célokkal és külön szorzóval
+- **Recept-kombók**: adott séf + adott fogás párosítás extra bónuszt ad — ez ad okot
+  a gyűjtemény cserélgetésére a végjátékban
+- Ellenőrzöm a nagy számok kezelését 1e30 felett
+
+**Kimenet:** egy `docs/BALANSZ.md` frissítés konkrét mért számokkal, nem érzésre.
+
+---
+
+## Nap 4 — Bevezetés, beállítások, hozzáférhetőség
+
+**Ez a nap dönti el a D1 retentiont.** A játék most okos, de egy új játékos hat rendszerbe
+csöppen bele egyszerre.
+
+**Mit csinálok**
+- **Fokozatos feltárás**: minden rendszer akkor jelenjen meg először, amikor értelme van
+  (a séfek fül már az elején, a liga a 3. fogástól, a menedzsment ott, ahol most)
+- **Vezetett első 3 perc**: nem modális tutorial, hanem célzott, egymondatos lépések —
+  az első koppintástól az első managerig és az első műszakig
+- **Beállítások képernyő**: hang, rezgés, mentés exportálása/importálása (ez adja vissza
+  a játékosnak a kontrollt a saját mentése felett), adatvédelmi link, jogi információk
+- **Hozzáférhetőség**: nagyobb betűméret opció, `prefers-reduced-motion` tisztelete,
+  színvakbarát jelzések (ne csak szín különböztesse meg az állapotokat)
+- Kis képernyő (360×640) és notch-os iPhone ellenőrzése
+
+---
+
+## Nap 5 — Monetizáció élesítése és mérés
+
+**Kódoldalon elkészült, fiók nélkül tesztelt állapotban:**
+- `game/monetization.ts`: AdMob-adapter (teszt-azonosítókkal), lustán, csak natív
+  platformon töltve — a webes build a csomag nélkül is fut és épül
+- A 4 jutalmazott reklámhely helyesen elkülönítve és bekötve: `offline_double`
+  (OfflineModal), `income_boost` (bolt), `shift_double` (műszak-eredmény),
+  `skip_cooldown` (ShiftLauncher)
+- GDPR: natívon a Google UMP (az AdMob csomag része) automatikusan kéri a
+  hozzájárulást; weben egy saját `ConsentBanner` az első indításkor
+- "Vásárlások visszaállítása" gomb a boltban (Apple megköveteli) — őszintén
+  jelzi, hogy web/mock alatt nincs mit visszaadni, natívon a bolt tényleges
+  vásárlás-előzményéből fog dolgozni
+- `game/analytics.ts`: Firebase Analytics-hoz ugyanaz a lusta-natív minta
+
+**⚠️ Ehhez kellenek a te fiókjaid — ezt nélküled nem tudom befejezni.**
+
+**Amit én megcsinálok**
+- `@capacitor-community/admob` bekötése a `monetization.ts` mögé, teszt-azonosítókkal
+- Mind a 4 jutalmazott reklámhely végigpróbálása (offline duplázás, x3 boost,
+  műszak-duplázás, cooldown-átugrás)
+- Google Play Billing / StoreKit termékek bekötése, sandbox-teszt
+- **"Vásárlások visszaállítása" gomb** — enélkül az App Store elutasítja
+- Analitika (GameAnalytics vagy Firebase) az `analytics.ts` mögé
+- GDPR hozzájárulás-kezelő (Google UMP, ingyenes)
+
+**Amit tőled kérek majd** (jó előre szólok, mert átfutási ideje van)
+1. **Google Play fejlesztői fiók** ($25 egyszeri) — az azonosság-igazolás 2-3 nap!
+2. **AdMob fiók** és a hozzá tartozó alkalmazás-azonosítók
+3. Döntés: induljon-e egyszerre az iOS ($99/év + Mac + Xcode kell hozzá), vagy
+   először csak web + Android
+
+---
+
+## Nap 6 — Natív build, eszközteszt, teljesítmény
+
+- `npx cap add android`, ikon- és splash-generálás minden méretben
+- **Aláíró kulcs (keystore) létrehozása** — ha ez elvész, az alkalmazás soha többé nem
+  frissíthető. Biztonságos mentést is beállítok, és megmutatom, hova tetted
+- Valódi eszközös teszt: gyenge telefon, kis képernyő, repülő mód, app-váltás,
+  bejövő hívás közben
+- **Csalás-teszt**: rendszeróra előre állítása ne adjon végtelen offline pénzt
+- Akkuhasználat mérése (a 60 ms-os tick nem lehet processzorzabáló)
+- iOS build, ha a Nap 5-ös döntés az volt
+
+---
+
+## Nap 7 — Store-oldal és kiadás
+
+- Ikon 3 változatban (A/B teszthez), 6 feliratos képernyőkép, 15-30 mp-es videó
+- Cím és leírás kulcsszavakkal: *idle, tycoon, restaurant, sushi, manager*
+- Adatvédelmi tájékoztató publikálása (GitHub Pages elég hozzá)
+- Play Console: adatbiztonsági űrlap, korhatár-kérdőív, tartalmi besorolás
+- **Web verzió élesítése** (Netlify/Vercel, 5 perc, nincs jóváhagyás) — ez az azonnali platform
+- Feltöltés belső tesztre, majd nyílt tesztre
+- Analitika-dashboard: D1, D7, ARPDAU, reklámnézés/DAU
+
+---
+
+## Ütemezési kockázat, amit most kell tudnod
+
+**A Google Play új fejlesztői fiókoknál 12 tesztelővel, 14 napig tartó zárt tesztet
+követelhet meg az éles kiadás előtt.** Ez azt jelenti, hogy a 7. napon **nem lesz
+éles Play Store-os megjelenés** — hanem elindul a tesztfolyamat.
+
+Amit ezzel kezdek:
+1. A **web verzió** a 7. napon élesben elérhető lesz, jóváhagyás nélkül. Ezen mérünk
+   először retentiont és bevételt.
+2. A Play zárt tesztje a 7. napon indul, tehát a 3. hét elején lehet éles.
+3. Ha van 12 ismerősöd, aki telepíti, azzal a folyamat gyorsul.
+
+**Ezért nem éri meg fizetett hirdetést indítani a 7. napon** — előbb legyen adat arról,
+hogy a játékos maradna-e ingyen is.
+
+---
+
+## Ahogy dolgozni fogok
+
+- **Minden nap végén**: zöld build, végigtesztelt új rendszer, frissített dokumentáció
+- **Minden balansz-változtatás előtt**: szimuláció, nem érzés (`node tools/balance-sim.mjs`)
+- **Minden új rendszer**: tiszta logika külön modulban, hogy tesztelhető legyen
+- Amit nem tudok eldönteni helyetted (fiókok, pénz, iOS igen/nem), azt **előre jelzem**,
+  nem a határidő előtt
+
+## Amit szándékosan NEM csinálok
+
+| Nem csinálom | Miért |
+|---|---|
+| Loot box, szerencsekerék | Szabályozási kockázat több EU-országban, cserébe a bevétel pár százaléka |
+| Saját backend, felhasználói fiókok | Szerverköltség és GDPR-teher az első verzióban; a liga szimulált ellenfelekkel megoldható |
+| Kényszerített reklám indításkor | A legnagyobb D1-gyilkos |
+| Több nyelv | Az angol lokalizáció a kiadás utáni első patch, nem előtte |
+| Egyedi grafika | 0 Ft art budget — emoji + CSS, ez tudatos döntés |
+
+---
+
+## Mikor mondhatjuk, hogy sikerült
+
+A kiadás utáni 2. hét adatai alapján:
+
+| Metrika | Cél | Ha nem jön össze |
+|---|---|---|
+| D1 retention | > 35% | A bevezetés a hibás — rövidíteni az első manager és az első műszak közti utat |
+| D7 retention | > 12% | Nincs elég hosszú távú cél — több végjáték-tartalom kell |
+| ARPDAU | > $0,05 | Kevés vagy rosszul elhelyezett a jutalmazott reklám |
+| Reklámnézés / DAU | 6-10 | A jutalom nem elég vonzó |
+
+1 000 napi aktív játékossal ez nagyjából **$2 200-2 400 havi bevétel** — a részletes
+számítás a [UZLETI-MODELL.md](UZLETI-MODELL.md)-ben.
