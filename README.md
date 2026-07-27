@@ -2,23 +2,34 @@
 
 Cross-platform idle/tycoon játék. **Egy kódbázis**, három platform: web (PWA), Android, iOS.
 
-> **Státusz:** játszható v0.3 — core loop, fejlesztésfa, manager-képességek,
-> csúcsforgalom és VIP események, küldetéslánc, trófeák, csillag-perkek,
-> offline bevétel, hang és rezgés. Ami hátra van: valódi reklám/IAP SDK-k
-> bekötése és store-kiadás (lásd [docs/HETI-TERV.md](docs/HETI-TERV.md)).
+> **🔗 Próbáld ki most, telefonon vagy böngészőben:**
+> **[takemycodem.github.io/SushiTycoon](https://takemycodem.github.io/SushiTycoon/)**
+> — nincs telepítés, nincs fiók, minden reklám/fizetés mock (nem költesz semmit).
+
+> **Státusz:** játszható v0.5 — core loop, fejlesztésfa, manager-képességek,
+> csúcsforgalom és VIP események, műszak-minijáték, menedzsment-réteg
+> (árazás, hírnév, alapanyag), séf-gyűjtemény recept-kombókkal, heti liga,
+> Michelin-fokozatú végjáték, küldetéslánc, trófeák, csillag-perkek,
+> offline bevétel, hang/rezgés, beállítások (nagyobb betűméret, mentés
+> export/import), angol UI, és egy lustán betöltött natív reklám/IAP adapter
+> (teszt-azonosítókkal, éles natív build nélkül még nem aktív).
+> Ami hátra van: natív build (Android/iOS) és store-kiadás
+> (lásd [docs/HETI-TERV.md](docs/HETI-TERV.md)).
 
 ## Miért nem "csak egy clicker"
 
-Három réteg épül egymásra — a kattintás csak az első 90 másodpercben főszereplő:
+Öt réteg épül egymásra — a kattintás csak az első 90 másodpercben főszereplő:
 
 | Réteg | Mit ad | Hol van |
 |---|---|---|
 | **Ügyesség** | **Műszak**: 60 másodperces kiszolgálós minijáték kombóval, VIP és nagy rendelésekkel. Mérve 2,6-szeres különbség kezdő és profi között | `shift.ts`, `ShiftGame.tsx` |
 | **Menedzsment** | Étlap-árazás, ahol az optimum a **hírnévvel együtt mozog**, plus alapanyag-piac napi árakkal, mennyiségi kedvezménnyel és beszállítói szerződéssel | `management.ts` |
-| **Gyűjtés** | 13 séf ritkasággal és passzív hatásokkal, töredékekből, **loot box nélkül**. A döntés a kinevezés: kevés a hely, és az azonos iskolájú páros bónuszt ad | `chefs.ts` |
+| **Gyűjtés** | 13 séf ritkasággal és passzív hatásokkal, töredékekből, **loot box nélkül**. A döntés a kinevezés: kevés a hely, az azonos iskolájú páros bónuszt ad, és minden séfnek van egy recept-kombója (signature dish, +15%) | `chefs.ts` |
+| **Verseny** | Heti liga, 20 fős tábla, 5 divízió, szimulált (nulla backend) ellenfelek — a pontszám kizárólag a műszak-teljesítményből jön | `league.ts` |
 | **Döntés** | Fejlesztésfa (globális vs. állomás-specifikus) és csillag-perkek, ahol az elköltött csillag **már nem ad bevétel-bónuszt** — valódi kompromisszum | `upgrades.ts`, `perks.ts` |
 | **Aktív** | Manager-képességek cooldownnal, csúcsforgalom (x2, 1 perc), elkapható VIP vendégek. A jó játékos a képességeket a csúcsforgalomra időzíti és összeláncolja | `abilities.ts`, események a `store.ts`-ben |
-| **Cél** | 27 küldetésből álló lánc (mindig 3 aktív) és 24 trófea, mindegyik +3% örök bevétellel | `quests.ts`, `achievements.ts` |
+| **Végjáték** | Michelin-fokozatok (karrier-csillag + prestige-szám együtt nyitja, +15/35/60% örök bónusz) | `michelin.ts` |
+| **Cél** | 30 elemű küldetéslánc (mindig 3 aktív) és 33 trófea, mindegyik +3% örök bevétellel | `quests.ts`, `achievements.ts` |
 
 ## Miért pont ez a játék?
 
@@ -80,21 +91,27 @@ src/
     abilities.ts     Manager-képességek (cooldown, hatás).
     shift.ts         Műszak-minijáték tiszta logikája (spawn, kombó, pontozás).
     management.ts    Árazás, hírnév, alapanyagpiac (napi ár, kedvezmény, szerződés).
-    chefs.ts         Séf-gyűjtemény: ritkaság, töredékek, hatások, iskola-szinergia.
-    quests.ts        24 elemű küldetéslánc.
-    achievements.ts  20 trófea, mind +3% örök bevétel.
+    chefs.ts         Séf-gyűjtemény: ritkaság, töredékek, hatások, iskola-szinergia, recept-kombók.
+    league.ts        Heti liga: divíziók, determinisztikus botok, fel-/kiesés.
+    michelin.ts       Végjáték-fokozatok: karrier-csillag + prestige-szám alapján.
+    quests.ts        30 elemű küldetéslánc.
+    achievements.ts  33 trófea, mind +3% örök bevétel.
     math.ts          Tiszta függvények: formázás, árak, bevétel, offline, prestige.
     store.ts         Zustand store — a teljes játékállapot és minden akció.
-    audio.ts         Szintetizált hangeffektek + rezgés (nulla hangfájl).
-    monetization.ts  Ads + IAP adapter. Élesítéskor EZT az egy fájlt cseréled.
-    analytics.ts     Eseménykövetés-adapter.
+    audio.ts         Szintetizált hangeffektek + rezgés (nulla hangfájl), külön kapcsolóval.
+    settings.ts      Nagyobb betűméret, mentés export/import.
+    monetization.ts  Ads + IAP adapter — lustán töltött natív AdMob/UMP ág, mock webes ág.
+    analytics.ts     Eseménykövetés-adapter (lustán töltött Firebase natívon).
     types.ts
   components/
-    TopBar, StationCard, Conveyor, AbilityBar, EventLayer, Modals
+    TopBar, StationCard, Conveyor, AbilityBar, EventLayer, Modals, SettingsModal, ConsentBanner
     ShiftGame, ShiftLauncher   A műszak minijáték és indítója
-    panels/          Fejlesztés, Küldetés, Csillag, Bolt fülek
+    panels/          Vezetés, Fejlesztés, Küldetés, Liga, Csillag, Bolt fülek
   App.tsx            Játékhurok + fül-navigáció
-docs/                Terv, üzleti modell, kiadási checklist
+public/
+  privacy.html       Adatvédelmi tájékoztató (store-kiadáshoz is kell).
+  sw.js              Service worker — app-shell cache offline induláshoz.
+docs/                Terv, üzleti modell, kiadási checklist, balansz
 ```
 
 **Fontos tervezési döntések:**
