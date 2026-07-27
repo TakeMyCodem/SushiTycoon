@@ -17,7 +17,10 @@ Nincs jóváhagyás, nincs díj. Itt lehet a legolcsóbban tesztelni, hogy a já
 **Egyszeri költség: $25.**
 
 - [ ] Fejlesztői fiók, azonosság-igazolás (2-3 nap átfutás!)
-- [ ] `npx cap add android`, majd `npm run android`
+- [x] `npx cap add android` — lefutott, `android/` helyben létezik (nincs git-ben)
+- [x] Első **debug** APK build sikeres (`./gradlew assembleDebug`), elküldve tesztre.
+      `npm run android` (Android Studio megnyitása) nincs kipróbálva — Android Studio
+      GUI nincs telepítve, csak a parancssori SDK
 - [ ] Csomagnév véglegesítése: `com.sushiempire.idle` — **utólag nem változtatható**
 - [ ] Verziószám és `versionCode` beállítása
 - [ ] Aláíró kulcs (upload keystore) + **Play App Signing** bekapcsolása

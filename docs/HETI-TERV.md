@@ -138,18 +138,43 @@ csöppen bele egyszerre.
 
 ## Nap 6 — Natív build, eszközteszt, teljesítmény
 
-**Részlegesen elkezdve, fiók/SDK nélkül amennyire lehetett:**
+**Frissítve: van már működő debug build.**
 - [x] `npx cap add android` lefutott — az `android/` mappa helyben létezik
       (szándékosan NEM kerül git-be, lásd `.gitignore` — a `cap add` bármikor
       újra legenerálja, nincs kézzel szerkesztett tartalma)
-- [ ] Tényleges build/futtatás blokkolva: ezen a gépen nincs Android SDK/Studio
-      telepítve (`ANDROID_HOME` üres, nincs `adb`/`gradle`). A `./gradlew tasks`
-      60 másodperc után timeoutolt SDK hiányában. Ehhez a te gépeden kell
-      Android Studio, vagy mondd, ha telepítsem ezen a gépen (nagy letöltés)
-- Ikon-/splash-generálás és a többi alábbi lépés natív build nélkül nem végezhető el
+- [x] **Android SDK + JDK 21 telepítve erre a gépre** (a te engedélyeddel):
+  - JDK 21 (Eclipse Temurin, `winget install EclipseAdoptium.Temurin.21.JDK`)
+    → `C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot`
+  - Android SDK parancssori eszközök → `C:\Android\sdk`
+    (platform-tools, platforms;android-36, build-tools 35.0.0 + 36.0.0)
+  - **Rendszerszintű módosítás ezen a gépen ennyi volt** — nincs PATH/env
+    változó globálisan beállítva, minden a build parancsban explicit exportolva
+- [x] **Első sikeres `./gradlew assembleDebug` build** — `app-debug.apk` (~4,2 MB),
+      elküldve neked közvetlenül. Nem Play Store-aláírású, telepítéskor
+      "ismeretlen forrásból telepítés" engedély kell hozzá a telefonon
+  - Útközbeni hiba, amit megoldottam: `java.io.IOException: Unable to establish
+    loopback connection` — a Windows `%TEMP%` rövid (8.3) elérési útja
+    (`TEB283~1`) összezavarta a JDK 21 új Unix-domain-socket alapú Gradle
+    daemon-kommunikációját. Megoldás: a build közben `TEMP`/`TMP` egy rövid,
+    tiszta útvonalra (`C:\gradletemp`) mutat
+  - Egy tranziens hálózati timeout (`dl.google.com`) is közbejött, újrapróbálásra
+    lement
+- [ ] Ikon-/splash-generálás: a `@capacitor/assets` csomagot kipróbáltam, de a
+      függőségi fájában kritikus, javítás nélküli sebezhetőség volt (`node-tar`
+      hardlink/symlink traversal) — eltávolítva, nem maradt a projektben.
+      A jelenlegi build a Capacitor alapértelmezett ikonjával/splash-ével megy,
+      a sajátunk (`public/icon-*.svg`) még nincs натívra konvertálva
+- [ ] Aláíró kulcs (release keystore), valódi eszközteszt, akkumérés — ezek
+      továbbra is hátravannak
 
-Amit még megcsinálok, mielőtt ez a nap valóban lezárul:
-- `npx cap add android`, ikon- és splash-generálás minden méretben
+**Hogyan reprodukálható/futtatható tovább:**
+```bash
+cd android
+JAVA_HOME="/c/Program Files/Eclipse Adoptium/jdk-21.0.11.10-hotspot" \
+PATH="$JAVA_HOME/bin:$PATH" ANDROID_HOME=/c/Android/sdk \
+TEMP="C:\gradletemp" TMP="C:\gradletemp" \
+./gradlew assembleDebug --no-daemon
+```
 - **Aláíró kulcs (keystore) létrehozása** — ha ez elvész, az alkalmazás soha többé nem
   frissíthető. Biztonságos mentést is beállítok, és megmutatom, hova tetted
 - Valódi eszközös teszt: gyenge telefon, kis képernyő, repülő mód, app-váltás,
