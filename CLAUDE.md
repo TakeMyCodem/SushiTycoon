@@ -95,8 +95,19 @@ Példa (offline bevétel ellenőrzése 5 órára):
 __math.offlineEarnings(__game.getState().s, 5 * 3600e3)
 ```
 
-Automatizált tesztkeretrendszer még nincs — ha bekerül (vitest), a `math.ts`
-tiszta függvényeivel kezdd, azok fedik le a pénzszámítás egészét.
+**Van automatizált tesztkeretrendszer (vitest).** A tiszta logikájú modulok
+(`math.ts`, `chefs.ts`, `league.ts`, `michelin.ts`, `shift.ts`) mellett egy-egy
+`*.test.ts` fájl fut:
+
+```bash
+npm run test
+```
+
+Ha egy tiszta függvényt módosítasz ezekben a modulokban, **futtasd a teszteket**
+— ez fedte fel korábban a `describeEffect` nyers-id hibáját és több szélsőérték-
+esetet (`fmt()` 1e21 fölött). A `npm run check` script már ezt is lefuttatja
+a `tsc`/`oxlint` mellett. Teszthez state kell? A `game/test-helpers.ts`
+`makeState()`-je ad egy minimális, érvényes `GameState`-et, felülírható mezőkkel.
 
 ## Balansz
 

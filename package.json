@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "check": "tsc -b && oxlint",
+    "test": "vitest run",
+    "check": "tsc -b && oxlint && vitest run",
     "sync": "npm run build && cap sync",
     "android": "npm run sync && cap open android",
     "ios": "npm run sync && cap open ios"
@@ -31,6 +32,7 @@
     "@vitejs/plugin-react": "^6.0.3",
     "oxlint": "^1.71.0",
     "typescript": "~6.0.2",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "vitest": "^4.1.10"
   }
 }
