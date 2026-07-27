@@ -109,6 +109,53 @@ describe('setPriceTier', () => {
 });
 
 describe('grantIap', () => {
+  it('gems_small grants exactly 100 gems', () => {
+    const before = useGame.getState().s.gems;
+    useGame.getState().grantIap('gems_small');
+    expect(useGame.getState().s.gems).toBe(before + 100);
+  });
+
+  it('gems_large grants exactly 1200 gems', () => {
+    const before = useGame.getState().s.gems;
+    useGame.getState().grantIap('gems_large');
+    expect(useGame.getState().s.gems).toBe(before + 1200);
+  });
+
+  it('noads only sets the noAds flag, nothing else', () => {
+    const before = useGame.getState().s;
+    useGame.getState().grantIap('noads');
+    const after = useGame.getState().s;
+    expect(after.noAds).toBe(true);
+    expect(after.vip).toBe(before.vip);
+    expect(after.gems).toBe(before.gems);
+  });
+
+  it('vip sets vip + noAds and grants 500 gems', () => {
+    const before = useGame.getState().s.gems;
+    useGame.getState().grantIap('vip');
+    const s = useGame.getState().s;
+    expect(s.vip).toBe(true);
+    expect(s.noAds).toBe(true);
+    expect(s.gems).toBe(before + 500);
+  });
+
+  it('starter grants gems, sets noAds, and (like whale) needs active income for its instant-cash portion', () => {
+    const before = useGame.getState().s.gems;
+    useGame.getState().grantIap('starter');
+    const s = useGame.getState().s;
+    expect(s.gems).toBe(before + 250);
+    expect(s.noAds).toBe(true);
+    expect(s.money).toBe(0); // no manager running yet -> incomePerSec is 0
+  });
+
+  it('an unrecognized sku silently grants nothing (no crash, no partial state change)', () => {
+    const before = useGame.getState().s;
+    useGame.getState().grantIap('not_a_real_sku');
+    const after = useGame.getState().s;
+    expect(after.gems).toBe(before.gems);
+    expect(after.money).toBe(before.money);
+  });
+
   it('gems_mega grants exactly 3500 gems', () => {
     const before = useGame.getState().s.gems;
     useGame.getState().grantIap('gems_mega');
