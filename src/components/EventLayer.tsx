@@ -22,25 +22,18 @@ export function EventLayer() {
 
   if (!event || event.until <= now) return null;
 
-  if (event.kind === 'vip') {
-    return (
-      <button
-        className="vip-guest"
-        style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-        onClick={catchVip}
-        title="VIP guest — tap them!"
-      >
-        🎩
-        <span className="vip-timer">{fmtTime(event.until - now)}</span>
-      </button>
-    );
-  }
+  if (event.kind !== 'vip') return null;
 
   return (
-    <div className="rush-banner">
-      ⏰ RUSH HOUR · x2 all income · {fmtTime(event.until - now)}
-      <span className="rush-hint">Fire off your abilities now!</span>
-    </div>
+    <button
+      className="vip-guest"
+      style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+      onClick={catchVip}
+      title="VIP guest — tap them!"
+    >
+      🎩
+      <span className="vip-timer">{fmtTime(event.until - now)}</span>
+    </button>
   );
 }
 

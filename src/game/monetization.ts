@@ -48,6 +48,14 @@ export const IAP_CATALOG: IapProduct[] = [
     price: '$9.99',
     badge: 'BEST VALUE',
   },
+  { sku: 'gems_mega', title: 'Gem Vault', desc: '3500 💎 (+45% bonus)', price: '$49.99' },
+  {
+    sku: 'whale',
+    title: "Chef's Legacy",
+    desc: 'Everything in VIP + 10,000 💎 + 24 hours of production instantly + an extra kitchen spot',
+    price: '$99.99',
+    badge: 'ULTIMATE',
+  },
 ];
 
 export interface AdsProvider {

@@ -470,16 +470,6 @@ button:disabled { cursor: default; }
   padding: 1px 7px; border-radius: 999px; white-space: nowrap;
 }
 
-.rush-banner {
-  position: fixed; top: calc(96px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
-  width: calc(100% - 28px); max-width: 492px; z-index: 24;
-  background: linear-gradient(90deg, var(--gold-2), var(--red));
-  color: #2b0d00; font-weight: 900; font-size: 13px; text-align: center;
-  padding: 8px; border-radius: 12px; box-shadow: 0 4px 20px #ff4d6355;
-  animation: pulse 1.4s ease-in-out infinite;
-}
-.rush-hint { display: block; font-size: 11px; font-weight: 700; opacity: 0.8; }
-
 .big-banner {
   position: fixed; top: calc(90px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
   width: calc(100% - 28px); max-width: 492px; z-index: 45;
@@ -549,9 +539,13 @@ button:disabled { cursor: default; }
   min-width: 18px; padding: 0 5px; border-radius: 999px;
 }
 .chef-body { min-width: 0; }
-.chef-head { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
+.chef-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 6px; align-items: baseline; }
 .chef-name { font-weight: 800; font-size: 14px; }
-.chef-rarity { font-size: 10px; font-weight: 800; white-space: nowrap; }
+.chef-rarity { font-size: 10px; font-weight: 800; white-space: nowrap; margin-left: auto; }
+.chef-today {
+  font-size: 10px; font-weight: 800; white-space: nowrap;
+  background: #3a2a0e; color: var(--gold); padding: 2px 7px; border-radius: 999px;
+}
 .chef-effect { font-size: 12px; color: var(--green); font-weight: 700; margin: 2px 0 5px; }
 .chef-flavor { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 5px; }
 .chef-max { font-size: 11px; font-weight: 800; color: var(--gold); }

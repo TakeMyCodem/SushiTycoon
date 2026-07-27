@@ -15,7 +15,7 @@ import { PERK_BY_ID, perkLevel, perkNextCost } from './perks';
 import { QUESTS, QUEST_BY_ID, initialQuests, nextQuestId } from './quests';
 import * as chefs from './chefs';
 import {
-  BASE_SLOTS, CHEF_BY_ID, FRAGMENT_GEM_COST, chefOfTheDay, chefState, describeEffect,
+  BASE_SLOTS, CHEF_BY_ID, FRAGMENT_GEM_COST, MAX_SLOTS, chefOfTheDay, chefState, describeEffect,
   fragmentsForNext, slotCost,
 } from './chefs';
 import * as management from './management';
@@ -567,10 +567,12 @@ export const useGame = create<Store>((set, get) => ({
 
   setPriceTier: (tier) => {
     const { s } = get();
-    if (tier < 0 || tier >= PRICE_TIERS.length) return;
+    if (tier < 0 || tier >= PRICE_TIERS.length || tier === s.priceTier) return;
     set({ s: { ...s, priceTier: tier } });
     sfx.buy();
     track('price_tier_set', { tier });
+    const t = PRICE_TIERS[tier];
+    get().showToast(`${t.emoji} ${t.name} — net effect x${management.netRate(t.price, s.reputation).toFixed(2)}`);
   },
 
   buyStock: (stationId, hours) => {
@@ -788,6 +790,14 @@ export const useGame = create<Store>((set, get) => ({
     }
     if (sku === 'vip') { next.vip = true; next.noAds = true; next.gems += 500; }
     if (sku === 'noads') next.noAds = true;
+    if (sku === 'gems_mega') next.gems += 3500;
+    if (sku === 'whale') {
+      next.vip = true;
+      next.noAds = true;
+      next.gems += 10000;
+      next.money += incomePerSec(s) * 3600 * 24;
+      next.slots = Math.min(MAX_SLOTS, s.slots + 1);
+    }
     set({ s: next });
     track('iap_granted', { sku });
     get().showToast('Thanks for your purchase! 🎉');

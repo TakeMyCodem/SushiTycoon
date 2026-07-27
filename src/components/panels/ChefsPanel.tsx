@@ -75,8 +75,11 @@ export function ChefsPanel() {
         </div>
         <p className="muted small">
           Two chefs from the same school in your kitchen give <b>+{SYNERGY_PCT}%</b> income.
-          Today's chef: {today.emoji} <b>{today.name}</b> — the daily gift and
-          shift stars hand out their fragments.
+        </p>
+        <p className="muted small">
+          🎁 <b>Free fragments</b> only come for today's featured chef — {today.emoji} <b>{today.name}</b> —
+          from the daily gift and from finishing a shift with stars. Every other chef: buy fragments
+          with 💎 gems below (fixed price, marked "+5" on their card).
         </p>
       </div>
 
@@ -97,6 +100,7 @@ export function ChefsPanel() {
             <div className="chef-body">
               <div className="chef-head">
                 <span className="chef-name">{def.name}</span>
+                {def.id === today.id && <span className="chef-today">🎁 Today's free fragments</span>}
                 <span className="chef-rarity" style={{ color: rar.color }}>
                   {SCHOOLS[def.school].emoji} {rar.label}
                 </span>
