@@ -88,6 +88,9 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           ad and payment providers (once live) will have their own privacy
           policies.
         </p>
+        <a className="btn btn-ghost" href="./privacy.html" target="_blank" rel="noopener">
+          📄 Full privacy policy
+        </a>
 
         <button className="btn btn-ghost" style={{ marginTop: 14 }} onClick={() => {
           if (confirm('Are you sure you want to delete your entire save? This cannot be undone.')) hardReset();

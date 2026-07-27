@@ -1,4 +1,5 @@
 import type { GameState } from './types';
+import { STATION_BY_ID } from './config';
 
 /**
  * Séf-gyűjtemény — a személyzet és a gyűjtögetés egy rendszerben.
@@ -251,11 +252,12 @@ export function hasCombo(s: GameState, stationId: string): boolean {
 /** A séf hatásának olvasható leírása adott szinten. */
 export function describeEffect(def: ChefDef, level: number): string {
   const v = Math.round(effectValue(def, Math.max(1, level)));
+  const dishName = (id: string) => STATION_BY_ID[id]?.name ?? id;
   switch (def.effect.kind) {
     case 'income':
-      return def.effect.target === 'all' ? `All income +${v}%` : `${def.effect.target} income +${v}%`;
+      return def.effect.target === 'all' ? `All income +${v}%` : `${dishName(def.effect.target)} income +${v}%`;
     case 'speed':
-      return def.effect.target === 'all' ? `All cycles ${v}% faster` : `${def.effect.target} cycle ${v}% faster`;
+      return def.effect.target === 'all' ? `All cycles ${v}% faster` : `${dishName(def.effect.target)} cycle ${v}% faster`;
     case 'shift':
       return `Shift points +${v}%`;
     case 'ingredient':
