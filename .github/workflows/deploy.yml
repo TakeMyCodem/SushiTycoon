@@ -21,7 +21,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 20 nem elég: a jsdom (a store.test.ts-hez kell) ^22.22.2-t vagy
+          # 24.15.0+-t kér (undici-n keresztül) — ez törte el az első
+          # vitest-es CI futást. 24-et használunk, ugyanazt, amin helyben
+          # is teszteltem, hogy ne legyen köztes verziós meglepetés.
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run test
