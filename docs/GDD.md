@@ -67,14 +67,18 @@ napokig fenntartja a haladás érzetét exponenciális számok mellett is.
 
 ## Roadmap a v0.1 után
 
-| Verzió | Tartalom | Miért |
-|---|---|---|
-| v0.2 | Küldetések, achievementek, VIP vendég esemény | Napi cél, aktív visszatérés |
-| v0.3 | Upgrade-fa gyémántért | Gyémánt-nyelő → IAP értelmet kap |
-| v1.0 | Hang, animációk, tutorial, natív reklám+IAP | Kiadható minőség |
-| v1.1 | 2. étterem-téma (ramen bár), külön prestige-réteg | Hosszú távú tartalom |
-| v1.2 | Felhő-mentés, ranglista | Kompetitív retention |
-| v1.3 | Szezonális események (cseresznyevirágzás, újév) | Visszatérési okok |
+*Frissítve útközben — lásd [HETI-TERV.md](HETI-TERV.md) a naprakész státuszért,
+ez a doksi az eredeti tervet mutatja, jelezve, mi valósult meg pontosan úgy,
+és mi másképp.*
+
+| Verzió | Eredeti terv | Miért | Státusz |
+|---|---|---|---|
+| v0.2 | Küldetések, achievementek, VIP vendég esemény | Napi cél, aktív visszatérés | ✅ Kész |
+| v0.3 | Upgrade-fa gyémántért | Gyémánt-nyelő → IAP értelmet kap | ✅ Kész |
+| v1.0 | Hang, animációk, tutorial, natív reklám+IAP | Kiadható minőség | ✅ Hang/rezgés/onboarding kész; natív reklám+IAP **adapter** kész, éles bekötés natív buildhez kötött (Nap 6, folyamatban) |
+| v1.1 | 2. étterem-téma (ramen bár), külön prestige-réteg | Hosszú távú tartalom | 🔁 Más irányban valósult meg: a "külön prestige-réteg" **Michelin-fokozatok** lett (karrier-csillag + prestige-szám), a ramen bár helyett séf-gyűjtemény + recept-kombó adja a végjáték-tartalmat. Külön étterem-téma nem épült |
+| v1.2 | Felhő-mentés, ranglista | Kompetitív retention | 🔁 A "ranglista" korábban valósult meg, mint tervezve: **heti liga**, szerver nélkül (determinisztikus botok). Felhő-mentés (fiók/backend) továbbra sincs — szándékos, lásd fent |
+| v1.3 | Szezonális események (cseresznyevirágzás, újév) | Visszatérési okok | ⏳ Nem kezdődött el |
 
 ## Kockázatok
 
@@ -83,4 +87,4 @@ napokig fenntartja a haladás érzetét exponenciális számok mellett is.
 | Senki nem találja meg | A hét utolsó napja teljesen ASO + videótartalom |
 | Túl gyorsan „kijátszható" | A mérföldkövek 800 szintig, 10 állomás, korlátlan prestige |
 | A reklámok elrontják az élményt | Csak önkéntes rewarded; az interstitial kikapcsolható, ha rontja a mért retention-t |
-| Órabállítós csalás | Offline idő maximálva; a mentés `lastSeen`-t használ, nem monoton órát — a v1.0-ban szerveridő-ellenőrzés |
+| Órabállítós csalás | Offline idő maximálva (tesztelve, `math.test.ts`); a mentés `lastSeen`-t használ, nem monoton órát, tehát ismételt "óra előre + újratöltés" korlátlan pénzt adhat — ez dokumentált, tudatosan vállalt kockázat, amíg nincs backend (lásd [KIADASI-CHECKLIST.md](KIADASI-CHECKLIST.md)) |
