@@ -634,7 +634,7 @@ button:disabled { cursor: default; }
 .bottombar {
   position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
   width: 100%; max-width: 520px;
-  display: grid; grid-template-columns: repeat(6, 1fr);
+  display: grid; grid-template-columns: repeat(7, 1fr);
   background: #14102a; border-top: 1px solid var(--line);
   padding: 6px 2px calc(6px + env(safe-area-inset-bottom));
   z-index: 30;
