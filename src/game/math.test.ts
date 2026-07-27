@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { fmt, milestoneMult, cycleIncome, starsFor } from './math';
+import {
+  fmt, fmtTime, milestoneMult, cycleIncome, incomePerSec, costFor, maxAffordable,
+  offlineCapMs, offlineEarnings, starsFor, abilityCooldown,
+} from './math';
 import { STATION_BY_ID } from './config';
 import { makeState } from './test-helpers';
 
@@ -82,5 +85,146 @@ describe('starsFor', () => {
 
   it('matches the documented formula: 20 * sqrt(lifetime / 1e9)', () => {
     expect(starsFor(2.5e8)).toBe(10); // BALANSZ.md's "~1 óra" reference point
+  });
+});
+
+describe('fmtTime', () => {
+  it('shows sub-10s durations with one decimal', () => {
+    expect(fmtTime(3500)).toBe('3.5s');
+  });
+
+  it('shows whole seconds under a minute', () => {
+    expect(fmtTime(45_000)).toBe('45s');
+  });
+
+  it('shows minutes and seconds under an hour', () => {
+    expect(fmtTime(90_000)).toBe('1m 30s');
+  });
+
+  it('shows hours and minutes at/above an hour', () => {
+    expect(fmtTime(3_661_000)).toBe('1h 1m');
+  });
+
+  it('never goes negative for an already-expired timer', () => {
+    expect(fmtTime(-500)).toBe('0s');
+  });
+});
+
+describe('costFor / maxAffordable', () => {
+  const def = STATION_BY_ID.maki;
+
+  it('buying 0 levels costs 0', () => {
+    expect(costFor(def, 0, 0)).toBe(0);
+  });
+
+  it('maxAffordable finds exactly as many levels as costFor confirms are affordable', () => {
+    const money = 10_000;
+    const n = maxAffordable(def, 0, money);
+    expect(costFor(def, 0, n)).toBeLessThanOrEqual(money);
+    expect(costFor(def, 0, n + 1)).toBeGreaterThan(money);
+  });
+
+  it('maxAffordable is 0 when you cannot even afford a single level', () => {
+    expect(maxAffordable(def, 0, 0)).toBe(0);
+  });
+
+  it('a higher current level costs more for the next level (geometric growth)', () => {
+    expect(costFor(def, 50, 1)).toBeGreaterThan(costFor(def, 0, 1));
+  });
+});
+
+describe('incomePerSec', () => {
+  it('ignores stations without a manager by default (onlyManaged=true)', () => {
+    const s = makeState({ stations: { ...makeState().stations, maki: { level: 10, manager: false, progress: 0, running: false } } });
+    expect(incomePerSec(s)).toBe(0);
+  });
+
+  it('counts a manager-run station', () => {
+    const s = makeState({ stations: { ...makeState().stations, maki: { level: 10, manager: true, progress: 0, running: true } } });
+    expect(incomePerSec(s)).toBeGreaterThan(0);
+  });
+
+  it('a station out of stock (management unlocked) contributes nothing even with a manager', () => {
+    const s = makeState({
+      managementUnlocked: true,
+      stock: { maki: 0 },
+      stations: { ...makeState().stations, maki: { level: 10, manager: true, progress: 0, running: true } },
+    });
+    expect(incomePerSec(s)).toBe(0);
+  });
+});
+
+describe('offlineCapMs', () => {
+  it('is the base cap plus 1h per Night Shift perk level', () => {
+    const base = makeState();
+    const perked = makeState({ perks: { offline: 3 } });
+    expect(offlineCapMs(perked)).toBe(offlineCapMs(base) + 3 * 3_600_000);
+  });
+
+  it('VIP gets the flat 24h cap regardless of perks', () => {
+    const s = makeState({ vip: true, perks: { offline: 6 } });
+    expect(offlineCapMs(s)).toBe(24 * 60 * 60 * 1000);
+  });
+});
+
+describe('offlineEarnings', () => {
+  it('returns null for a very short absence (under a minute) even with a manager running', () => {
+    const s = makeState({ stations: { ...makeState().stations, maki: { level: 10, manager: true, progress: 0, running: true } } });
+    expect(offlineEarnings(s, 30_000)).toBeNull();
+  });
+
+  it('returns null when nothing is manager-run (nothing could have earned anything)', () => {
+    const s = makeState();
+    expect(offlineEarnings(s, 3_600_000)).toBeNull();
+  });
+
+  it('earns money proportional to elapsed time for a manager-run station with no stock limit', () => {
+    const s = makeState({ stations: { ...makeState().stations, maki: { level: 10, manager: true, progress: 0, running: true } } });
+    const oneHour = offlineEarnings(s, 3_600_000);
+    const twoHours = offlineEarnings(s, 7_200_000);
+    expect(oneHour).not.toBeNull();
+    expect(twoHours!.earned).toBeCloseTo(oneHour!.earned * 2, 2);
+  });
+
+  it('caps the counted time at offlineCapMs, even if you were away much longer', () => {
+    const s = makeState({ stations: { ...makeState().stations, maki: { level: 10, manager: true, progress: 0, running: true } } });
+    const cap = offlineCapMs(s);
+    const withinCap = offlineEarnings(s, cap);
+    const wayOver = offlineEarnings(s, cap * 10);
+    expect(wayOver!.earned).toBeCloseTo(withinCap!.earned, 2);
+    expect(wayOver!.ms).toBe(cap);
+  });
+
+  it('sets ranDry and stops earning once ingredient stock runs out mid-absence', () => {
+    const s = makeState({
+      managementUnlocked: true,
+      stock: { maki: 5 }, // only 5 servings available
+      stations: { ...makeState().stations, maki: { level: 10, manager: true, progress: 0, running: true } },
+    });
+    const report = offlineEarnings(s, 3_600_000)!; // an hour is plenty to exhaust 5 servings
+    expect(report.ranDry).toBe(true);
+    expect(report.consumed.maki).toBeCloseTo(5, 5);
+  });
+
+  it('does not set ranDry when stock comfortably outlasts the absence', () => {
+    const s = makeState({
+      managementUnlocked: true,
+      stock: { maki: 1_000_000 },
+      stations: { ...makeState().stations, maki: { level: 10, manager: true, progress: 0, running: true } },
+    });
+    const report = offlineEarnings(s, 3_600_000)!;
+    expect(report.ranDry).toBe(false);
+  });
+});
+
+describe('abilityCooldown', () => {
+  it('reduces the base cooldown by 10% per Quick Hands perk level', () => {
+    const s = makeState({ perks: { quick_hands: 2 } });
+    expect(abilityCooldown(s, 100_000)).toBeCloseTo(80_000, 5);
+  });
+
+  it('is unchanged with no perk levels', () => {
+    const s = makeState();
+    expect(abilityCooldown(s, 100_000)).toBe(100_000);
   });
 });
