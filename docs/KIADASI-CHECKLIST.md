@@ -2,10 +2,13 @@
 
 ## 0. Web (a leggyorsabb út — ma is élesíthető)
 
-- [ ] `npm run build`
-- [ ] `dist/` feltöltése Netlify / Vercel / Cloudflare Pages-re (drag & drop is elég)
-- [ ] HTTPS ellenőrzése — service worker nélküle nem működik
-- [ ] Telefonon: „Hozzáadás a kezdőképernyőhöz" teszt
+- [x] `npm run build`
+- [x] `dist/` feltöltése — Netlify/Vercel helyett GitHub Pages lett (ugyanaz a végeredmény, ingyenes,
+      már be van kötve GitHub Actionsbe: minden `main`-re push újraépíti és kiteszi)
+      → **https://takemycodem.github.io/SushiTycoon/**
+- [x] HTTPS ellenőrzése — GitHub Pages alapból HTTPS, a service worker működik rajta
+- [x] Telefonon: „Hozzáadás a kezdőképernyőhöz" teszt — a manifest/SW útvonalak javítva az
+      alkönyvtáras (`/SushiTycoon/`) kiszolgáláshoz, ellenőrizve élesben
 
 Nincs jóváhagyás, nincs díj. Itt lehet a legolcsóbban tesztelni, hogy a játék megfogja-e az embereket.
 
@@ -21,7 +24,7 @@ Nincs jóváhagyás, nincs díj. Itt lehet a legolcsóbban tesztelni, hogy a já
 - [ ] `.aab` (Android App Bundle) build, nem `.apk`
 - [ ] Adatbiztonsági űrlap: mit gyűjt a reklám-SDK (ezt az SDK dokumentációja adja meg)
 - [ ] Tartalmi besorolás kérdőív
-- [ ] Adatvédelmi tájékoztató URL
+- [x] Adatvédelmi tájékoztató URL — kész: https://takemycodem.github.io/SushiTycoon/privacy.html
 - [ ] Belső teszt → zárt teszt → nyílt teszt → éles
       (új fiókoknál **12 tesztelő × 14 nap** zárt teszt kötelező lehet — ezzel tervezz!)
 
@@ -44,9 +47,10 @@ Nincs jóváhagyás, nincs díj. Itt lehet a legolcsóbban tesztelni, hogy a já
 - [ ] Óra átállítása előre nem ad végtelen pénzt
 - [ ] Minden reklámhely megjelenik és jutalmaz (teszt-azonosítókkal)
 - [ ] Minden IAP megvehető sandboxban, és a vásárlás visszaáll újratelepítés után
-- [ ] Kis képernyőn (360×640) sem lóg ki semmi
-- [ ] Notch-os iPhone-on nem takarja a felső sávot semmi
-- [ ] A játék nem fagy 1e30 feletti számoknál
+- [x] Kis képernyőn (360×640, 375px) sem lóg ki semmi — ellenőrizve minden fülön/al-fülön
+- [ ] Notch-os iPhone-on nem takarja a felső sávot semmi (valódi eszköz kell hozzá, Nap 6)
+- [x] A játék nem fagy 1e30 feletti számoknál — élesben tesztelve 1e99-ig, a `fmt()` tudományos
+      jelölésre vált 1e80 fölött, nincs `NaN`/`Infinity`
 
 ## 4. Kiadás után — az első hét
 
