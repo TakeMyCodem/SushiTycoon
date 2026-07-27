@@ -510,3 +510,85 @@ describe('claimDaily', () => {
     expect(useGame.getState().s.dailyStreak).toBe(1);
   });
 });
+
+/**
+ * checkProgress() (management unlock, free manager, quests, achievements,
+ * league week resolution, michelin banners) is module-private — only
+ * reachable through tick(), which accumulates elapsed time in a
+ * module-level `checkAcc` and runs it every CHECK_INTERVAL_MS (400ms).
+ * A single `tick(400)` is enough to trigger it in one call.
+ */
+describe('tick -> checkProgress', () => {
+  it('unlocks the management layer once 3 dishes are open, granting starting stock', () => {
+    useGame.setState((p) => ({
+      s: {
+        ...p.s,
+        stations: {
+          ...p.s.stations,
+          maki: { level: 1, manager: false, progress: 0, running: false },
+          nigiri: { level: 1, manager: false, progress: 0, running: false },
+          sashimi: { level: 1, manager: false, progress: 0, running: false },
+        },
+      },
+    }));
+    useGame.getState().tick(400);
+    const s = useGame.getState().s;
+    expect(s.managementUnlocked).toBe(true);
+    expect(s.stock.maki).toBeGreaterThan(0);
+  });
+
+  it('grants a free manager for the first station once it reaches level 10', () => {
+    useGame.setState((p) => ({ s: { ...p.s, stations: { ...p.s.stations, maki: { level: 10, manager: false, progress: 0, running: false } } } }));
+    useGame.getState().tick(400);
+    const s = useGame.getState().s;
+    expect(s.stations.maki.manager).toBe(true);
+    expect(s.stats.managersHired).toBe(1);
+  });
+
+  it('completes a quest once its target is met, grants the reward, and queues the next quest', () => {
+    useGame.setState((p) => ({
+      s: { ...p.s, activeQuests: ['q1', 'q2', 'q3'], stations: { ...p.s.stations, maki: { level: 25, manager: false, progress: 0, running: false } } },
+    }));
+    useGame.getState().tick(400);
+    const s = useGame.getState().s;
+    expect(s.doneQuests).toContain('q1');
+    expect(s.activeQuests).not.toContain('q1');
+    expect(s.activeQuests).toHaveLength(3); // q4 queued in to replace q1
+    expect(s.gems).toBeGreaterThan(0); // q1's reward is gems
+  });
+
+  it('unlocks an achievement once its condition is met, for a permanent income bonus', () => {
+    useGame.setState((p) => ({ s: { ...p.s, stats: { ...p.s.stats, taps: 100 } } }));
+    useGame.getState().tick(400);
+    expect(useGame.getState().s.achievements).toContain('a_tap100');
+  });
+
+  it('resolves the league week once it has rolled over, resetting points and possibly changing division', () => {
+    const staleWeek = useGame.getState().s.league.weekNumber - 1;
+    useGame.setState((p) => ({ s: { ...p.s, league: { weekNumber: staleWeek, division: 0, points: 50 } } }));
+    useGame.getState().tick(400);
+    const s = useGame.getState().s;
+    expect(s.league.weekNumber).toBeGreaterThan(staleWeek);
+    expect(s.league.points).toBe(0); // fresh week
+    expect(s.lastLeagueOutcome).not.toBeNull();
+  });
+
+  it('does NOT resolve the league week if it has not rolled over yet', () => {
+    useGame.setState((p) => ({ s: { ...p.s, league: { ...p.s.league, points: 50 } } }));
+    useGame.getState().tick(400);
+    expect(useGame.getState().s.league.points).toBe(50); // untouched
+    expect(useGame.getState().s.lastLeagueOutcome).toBeNull();
+  });
+
+  it('marks a Michelin rank as seen once both its thresholds are crossed', () => {
+    useGame.setState((p) => ({ s: { ...p.s, stars: 100, starsSpent: 0, stats: { ...p.s.stats, prestiges: 3 }, michelinRankSeen: 0 } }));
+    useGame.getState().tick(400);
+    expect(useGame.getState().s.michelinRankSeen).toBe(1);
+  });
+
+  it('does not re-flag a Michelin rank that was already seen', () => {
+    useGame.setState((p) => ({ s: { ...p.s, stars: 100, starsSpent: 0, stats: { ...p.s.stats, prestiges: 3 }, michelinRankSeen: 1 } }));
+    useGame.getState().tick(400);
+    expect(useGame.getState().s.michelinRankSeen).toBe(1); // unchanged, no re-trigger
+  });
+});
